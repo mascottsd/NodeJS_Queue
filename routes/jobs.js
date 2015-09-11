@@ -47,9 +47,12 @@ router.put('/:id', function(req, res) {
     var db = req.db;
     var collection = db.get('/');
     var setObj = { _id: req.params.id };
+ 	var job = req.body;
+	var data = {$set: job };
+/* 	//Only the HTML is changing... should be a PATCH, but that didn't work at all
 	var htmlTxt = req.body.html;
 	if (!htmlTxt) htmlTxt = '(Empty Page)';
-	var data = {$set: {html: htmlTxt} };
+	var data = {$set: {html: htmlTxt} }; */
     collection.update(setObj, data, function(err, result){
         res.send(
             (err === null) ? { msg: '' } : { msg: err }

@@ -22,7 +22,7 @@ var homeBase = 'http://localhost:3000/jobs/';
 var outputWaiting = 1; //when we don't do any work, tell them we're waiting
 //GET THE NEXT JOB IN THE LIST...
 function MainFn() {
-	console.log('Getting jobs...');
+//	console.log('Getting jobs...');
 	request( homeBase + 'jobq', function(error, response,  data ) {
 		var job = JSON.parse(data)[0];
 		if (job) {
@@ -37,11 +37,10 @@ function MainFn() {
 			request( url, function(error, response, html) {
 				if (!error){
 					//SAVE THE HTNL TO THE DATABASE
+					//console.log('...DONE. Waiting...');
 					//console.log(html);
-					var upData = {};
-					//upData._id = jobId;
-					upData.html = encodeHTMLEntities(html);
-					request({ url: (homeBase + jobId), method: 'PUT', json: upData });
+					job.html = encodeHTMLEntities(html);
+					request({ url: (homeBase + jobId), method: 'PUT', json: job });
 					//var sqlTxt = "UPDATE tbl_jobs SET html=\""+ html +"\" WHERE id="+ jobId;
 					//db.query(sqlTxt);
 				} else {
