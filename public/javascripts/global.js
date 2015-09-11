@@ -4,16 +4,22 @@ var jobListData = [];
 // DOM Ready =============================================================
 $(document).ready(function()
 {
-    // Populate the job table on initial page load
-    populateTable();
+	if ( document.title.indexOf('Work') >= 0 ) {
+		//$('#worker').append('Starting');
+		MainFn();
+		
+	} else {
+		// Populate the job table on initial page load
+		populateTable();
 
-    // Jobname link click
-    $('#jobList table tbody').on('click', 'td a.linkshowjob', showJobInfo);
-    // Delete Job link click
-    $('#jobList table tbody').on('click', 'td a.linkdeletejob', deleteJob);
+		// Jobname link click
+		$('#jobList table tbody').on('click', 'td a.linkshowjob', showJobInfo);
+		// Delete Job link click
+		$('#jobList table tbody').on('click', 'td a.linkdeletejob', deleteJob);
 
-    // Add Job button click
-    $('#btnAddJob').on('click', addJob);
+		// Add Job button click
+		$('#btnAddJob').on('click', addJob);
+	}
 });
 
 // Functions =============================================================
@@ -24,7 +30,7 @@ function populateTable()
     var tableContent = ''; // Empty content string
 
     // jQuery AJAX call for JSON
-    $.getJSON( '/jobs/joblist', function( data ) {
+    $.getJSON( '/jobs/', function( data ) {
 
         // Stick our job data array into a joblist variable in the global object
         jobListData = data;
@@ -136,3 +142,49 @@ function deleteJob(event)
     }
 
 };
+
+
+var outputWaiting = 1; //when we don't do any work, tell them we're waiting
+//GET THE NEXT JOB IN THE LIST...
+function MainFn() {
+//	db.query("SELECT * FROM tbl_jobs WHERE html IS NULL OR html='' ORDER BY ID", function(err, rows, fields) {
+	$('#worker').append('Getting jobs...');
+   $.getJSON( '/jobs/', function( data ) {
+		var job = data[0];
+		if (job) {
+			outputWaiting = 1;
+			//SCRAPE THE URL...
+			var url = job.url;
+			var jobId = job._id;
+			if ( url.substr(0, 4) != 'http')
+				url = "http://"+ url;
+
+			var outTxt = "<BR>Retrieving Job "+ jobId +": "+ url +"...";
+			//console.log( outTxt );
+			$('#worker').append(outTxt);
+			request( url, function(error, response, html) {
+				$('#worker').append('ok');
+				if (!error){
+					//SAVE THE HTNL TO THE DATABASE
+					var upData = {};
+					upData.html = db.encodeHTMLEntities(html);
+					$('#worker').append(html);
+					$.putJSON( '/jobs/'+ jobId, upData );
+					//var sqlTxt = "UPDATE tbl_jobs SET html=\""+ html +"\" WHERE id="+ jobId;
+					//db.query(sqlTxt);
+				} else {
+					//console.log('Error: '+ error);
+					$('#worker').append('Error: '+ error);
+				}
+			});
+			
+		} else {
+			if (outputWaiting) {
+				//xconsole.log('No jobs left to perform. Waiting...');
+				$('#worker').append('No jobs left to perform. Waiting...');
+			}
+			outputWaiting = 0;
+		}
+		setTimeout(MainFn, 3000);
+	});
+}
