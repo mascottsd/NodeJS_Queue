@@ -49,7 +49,7 @@ router.put('/:id', function(req, res) {
     var setObj = { _id: req.params.id };
  	var job = req.body;
 	var data = {$set: job };
-/* 	//Only the HTML is changing... should be a PATCH, but that didn't work at all
+/* 	//Only the HTML is changing... should be a PATCH (router.patch), but that didn't work at all
 	var htmlTxt = req.body.html;
 	if (!htmlTxt) htmlTxt = '(Empty Page)';
 	var data = {$set: {html: htmlTxt} }; */
