@@ -1,0 +1,35 @@
+extends layout
+
+block content
+    h1= title
+    p Welcome to our web worker
+
+    // Wrapper
+    #wrapper
+        // JOB INFO
+        #jobInfo
+            h2 Job Info
+            p
+                strong Html:
+                br
+                <span id='jobInfoHtml'></span>
+        // /JOB INFO
+
+        // JOB LIST
+        h2 Job List
+        #jobList
+            table
+                thead
+                    th ID
+                    th Url
+                tbody
+        // /JOB LIST
+
+        // ADD JOB
+        h2 Add Job
+        #addJob
+            fieldset
+                input#inputJobUrl(type='text', placeholder='url')
+                button#btnAddJob Add Job
+        // /ADD JOB
+    // /WRAPPER
